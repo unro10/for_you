@@ -65,9 +65,9 @@
         .rolling-note {
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
         }
-        /* 메모에 마우스를 올렸을 때 살짝 커지며 정면으로 돌아오는 효과 (삭제 버튼 없음) */
+        /* 메모에 마우스를 올렸을 때 살짝 커지며 정면으로 돌아오는 효과 */
         .rolling-note:hover {
-            transform: scale(1.08) rotate(0deg) !important;
+            transform: scale(1.05) rotate(0deg) !important;
             z-index: 50 !important;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
         }
@@ -135,8 +135,8 @@
             <span class="text-xs text-white/80 font-medium hidden sm:inline-block">※ 등록된 메시지는 영구 보존되며 삭제할 수 없습니다 (잠금모드 적용).</span>
         </div>
         
-        <!-- 메모들이 그리드 형태로 무작위 배치되는 컨테이너 -->
-        <div id="boardContainer" class="relative w-full flex-grow min-h-[450px] overflow-y-auto p-2 md:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 content-start">
+        <!-- 메모들이 그리드 형태로 무작위 배치되는 컨테이너 (items-start 적용으로 내용물 높이에 맞춤) -->
+        <div id="boardContainer" class="relative w-full flex-grow min-h-[450px] overflow-y-auto p-2 md:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-start content-start">
             <!-- 초기 로딩 표시 -->
             <div class="col-span-full flex flex-col items-center justify-center py-20 text-white font-bold title-font">
                 실시간 메시지를 불러오는 중입니다... ⏳
@@ -196,7 +196,8 @@
                 const card = document.createElement('div');
                 const randomRotation = note.rotation !== undefined ? note.rotation : (Math.random() * 8 - 4);
                 
-                card.className = `rolling-note ${note.color} p-5 rounded-2xl shadow-md border flex flex-col justify-between relative transform transition duration-300 min-h-[160px]`;
+                // min-h-[160px] 제거하고 내용에 따라 크기가 가변적으로 늘어나도록 수정
+                card.className = `rolling-note ${note.color} p-5 rounded-2xl shadow-md border flex flex-col justify-between relative transform transition duration-300`;
                 card.style.transform = `rotate(${randomRotation}deg)`;
 
                 // 날짜 포맷팅 처리
@@ -213,9 +214,10 @@
                     <div>
                         <p class="handwriting text-lg md:text-xl font-bold leading-relaxed break-words mb-4">"${escapeHtml(note.message)}"</p>
                     </div>
-                    <div class="flex justify-between items-end pt-2 border-t border-black/10 text-xs opacity-80">
-                        <span class="font-bold truncate max-w-[100px]">from. ${escapeHtml(note.author)}</span>
-                        <span class="text-[10px]">${dateStr}</span>
+                    <div class="flex justify-between items-end gap-2 pt-2 border-t border-black/10 text-xs opacity-80">
+                        <!-- 닉네임이 길어도 잘리지 않고 줄바꿈/전체 표시되도록 수정 -->
+                        <span class="font-bold break-all">from. ${escapeHtml(note.author)}</span>
+                        <span class="text-[10px] whitespace-nowrap">${dateStr}</span>
                     </div>
                 `;
                 boardContainer.appendChild(card);
@@ -263,7 +265,6 @@
                 boardContainer.scrollTo({ top: 0, behavior: 'smooth' });
             } catch (error) {
                 console.error("저장 실패: ", error);
-                // 브라우저 alert 대신 커스텀 콘솔/예외 처리
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = "메모 붙이기 💌";
