@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- 문서의 문자셋 및 뷰포트 설정 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>롤링 페이퍼</title>
+    
+    <!-- 스타일링을 위한 Tailwind CSS CDN 로드 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 아기자기하고 감성적인 타이포그래피를 위한 Google 폰트 (고운돋움, 주아, 푸른스토리) 로드 -->
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&family=Poor+Story&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 기본 본문 스타일 설정 */
+        body {
+            font-family: 'Gowun Dodum', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            /* 흐르는 듯한 세로 무지개 그라데이션 배경 애니메이션 설정 */
+            background: linear-gradient(
+                180deg, 
+                #ff9a9e 0%, 
+                #fad0c4 16%, 
+                #ffd1ff 33%, 
+                #c2e9fb 50%, 
+                #d4fc79 66%, 
+                #96e6a1 83%, 
+                #fbc531 100%
+            );
+            background-size: 100% 300%;
+            animation: rainbowFlow 15s ease infinite alternate;
+        }
+
+        /* 무지개 배경이 부드럽게 위아래로 움직이는 키프레임 애니메이션 */
+        @keyframes rainbowFlow {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 0% 100%; }
+        }
+
+        /* 타이틀 전용 귀여운 폰트 클래스 */
+        .title-font {
+            font-family: 'Jua', sans-serif;
+        }
+
+        /* 손글씨 느낌의 메모 내용 전용 폰트 클래스 */
+        .handwriting {
+            font-family: 'Poor Story', cursive;
+        }
+
+        /* 스크롤바 디자인 커스텀 (전시 공간 영역) */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 4px;
+        }
+
+        /* 롤링페이퍼 메모지 호버 효과 및 애니메이션 */
+        .rolling-note {
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+        }
+        /* 메모에 마우스를 올렸을 때 살짝 커지며 정면으로 돌아오는 효과 (삭제 버튼 없음) */
+        .rolling-note:hover {
+            transform: scale(1.08) rotate(0deg) !important;
+            z-index: 50 !important;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-4 md:p-8">
+
+    <!-- 상단 헤더 영역: 메인 타이틀 및 소개 문구 -->
+    <header class="w-full max-w-5xl text-center my-6 z-20">
+        <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full shadow-lg mb-3 border border-white/60">
+            <span class="text-xs md:text-sm font-bold tracking-widest text-purple-800 uppercase">✨롤링페이퍼✨</span>
+        </div>
+        <h1 class="title-font text-4xl md:text-6xl lg:text-7xl text-white drop-shadow-[0_4px_10px_rgba(0,0,0,0.3)] tracking-wider">
+            잘가라 공허야 또 만나자
+        </h1>
+        <p class="text-white/90 text-sm md:text-base mt-2 font-semibold drop-shadow">
+            잘가게
+        </p>
+    </header>
+
+    <!-- 중단 메인 영역: 새로운 메모를 작성하는 폼 카드 -->
+    <main class="w-full max-w-3xl bg-white/70 backdrop-blur-xl rounded-3xl p-6 md:p-8 shadow-2xl border border-white/80 z-20 mb-8">
+        <form id="rollingForm" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- 작성자 이름 입력 칸 -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">닉네임</label>
+                    <input type="text" id="authorInput" required maxlength="15" placeholder="익명도 가능합니다" 
+                        class="w-full px-4 py-3 rounded-xl bg-white/90 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-gray-800 text-sm transition">
+                </div>
+                <!-- 메모지 색상 선택 셀렉트박스 -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">메모지 색상</label>
+                    <select id="colorInput" class="w-full px-4 py-3 rounded-xl bg-white/90 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-gray-800 text-sm transition">
+                        <option value="bg-yellow-100 text-yellow-900 border-yellow-300">Yellow</option>
+                        <option value="bg-pink-100 text-pink-900 border-pink-300">Pink</option>
+                        <option value="bg-blue-100 text-blue-900 border-blue-300">Blue</option>
+                        <option value="bg-green-100 text-green-900 border-green-300">Green</option>
+                        <option value="bg-purple-100 text-purple-900 border-purple-300">Purple</option>
+                        <option value="bg-orange-100 text-orange-900 border-orange-300">Orange</option>
+                    </select>
+                </div>
+            </div>
+            <!-- 메시지 내용 입력 텍스트에리어 -->
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">메시지 내용</label>
+                <textarea id="messageInput" required rows="3" maxlength="500" placeholder="500자 이내로 작성해주세요." 
+                    class="w-full px-4 py-3 rounded-xl bg-white/90 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-gray-800 text-sm transition resize-none"></textarea>
+            </div>
+            <!-- 제출 버튼 -->
+            <div class="flex justify-end">
+                <button type="submit" class="title-font px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition transform active:scale-95 text-lg">
+                    메모 붙이기 💌
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <!-- 하단 섹션: 작성된 메모들이 롤링페이퍼 형식으로 전시되는 공간 -->
+    <section class="w-full max-w-6xl flex-grow relative bg-white/20 backdrop-blur-md rounded-3xl p-4 md:p-8 shadow-inner border border-white/30 min-h-[500px] overflow-hidden mb-8 flex flex-col">
+        <div class="flex justify-between items-center mb-4 px-2">
+            <h2 class="title-font text-xl md:text-2xl text-white drop-shadow flex items-center gap-2">
+                📌 롤링페이퍼 전시 공간 <span id="noteCount" class="text-sm bg-white/50 px-2.5 py-0.5 rounded-full text-purple-900">0</span>
+            </h2>
+            <span class="text-xs text-white/80 font-medium hidden sm:inline-block">※ 등록된 메시지는 영구 보존되며 삭제할 수 없습니다.</span>
+        </div>
+        
+        <!-- 메모들이 그리드 형태로 무작위 배치되는 컨테이너 -->
+        <div id="boardContainer" class="relative w-full flex-grow min-h-[450px] overflow-y-auto p-2 md:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 content-start">
+            <!-- 자바스크립트에 의해 동적으로 메모 카드들이 생성되어 추가됩니다. -->
+        </div>
+    </section>
+
+    <!-- 푸터 영역: 저작권 및 안내 문구 -->
+    <footer class="w-full text-center py-4 text-white/80 text-xs md:text-sm font-semibold z-20">
+        <p>©NaehCM</p>
+    </footer>
+
+    <!-- 자바스크립트 로직 영역 -->
+    <script>
+        // 브라우저의 로컬 스토리지에서 저장된 메모 목록을 불러오는 함수 (초기값 빈 배열)
+        function getNotes() {
+            const saved = localStorage.getItem('rolling_paper_notes_v4');
+            if (!saved) {
+                return [];
+            }
+            try {
+                return JSON.parse(saved);
+            } catch (e) {
+                return [];
+            }
+        }
+
+        // 작성된 메모 목록을 브라우저 로컬 스토리지에 영구 저장하는 함수 (삭제 기능 없음)
+        function saveNotes(notes) {
+            localStorage.setItem('rolling_paper_notes_v4', JSON.stringify(notes));
+        }
+
+        // 메모 데이터를 기반으로 화면의 전시 보드(boardContainer)를 그려주는 함수
+        function renderBoard() {
+            const container = document.getElementById('boardContainer');
+            const noteCountEl = document.getElementById('noteCount');
+            const notes = getNotes();
+
+            // 기존 내용을 초기화하고 최신 카운트 반영
+            container.innerHTML = '';
+            noteCountEl.textContent = notes.length;
+
+            // 등록된 메모가 없을 경우 안내 문구 표시
+            if (notes.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-20 text-white/80">
+                        <p class="text-xl font-bold title-font">아직 등록된 메시지가 없어요!</p>
+                        <p class="text-sm mt-1">첫 번째 주인공이 되어 메시지를 남겨보세요.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 각 메모 객체를 순회하며 카드 엘리먼트 생성 및 배치
+            notes.forEach((note) => {
+                const card = document.createElement('div');
+                // 롤링페이퍼 특유의 자유분방한 느낌을 위해 미세한 회전 각도(rotation) 부여
+                const randomRotation = note.rotation !== undefined ? note.rotation : (Math.random() * 8 - 4);
+                
+                card.className = `rolling-note ${note.color} p-5 rounded-2xl shadow-md border flex flex-col justify-between relative transform transition duration-300 min-h-[160px]`;
+                card.style.transform = `rotate(${randomRotation}deg)`;
+
+                // 메모지 상단에 붙어 있는 투명한 스카치테이프 효과 엘리먼트 추가
+                card.innerHTML = `
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 w-12 h-4 bg-white/40 backdrop-blur-sm rounded-sm border border-white/50 shadow-sm pointer-events-none"></div>
+                    <div>
+                        <p class="handwriting text-lg md:text-xl font-bold leading-relaxed break-words mb-4">"${escapeHtml(note.message)}"</p>
+                    </div>
+                    <div class="flex justify-between items-end pt-2 border-t border-black/10 text-xs opacity-80">
+                        <span class="font-bold truncate max-w-[100px]">from. ${escapeHtml(note.author)}</span>
+                        <span class="text-[10px]">${note.date || ''}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 사용자 입력값에 포함될 수 있는 악성 스크립트를 방지하기 위한 HTML 이스케이프 헬퍼 함수
+        function escapeHtml(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        // 폼 제출 이벤트 리스너: 새로운 메모를 추가하고 화면을 갱신
+        document.getElementById('rollingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const author = document.getElementById('authorInput').value.trim();
+            const message = document.getElementById('messageInput').value.trim();
+            const color = document.getElementById('colorInput').value;
+
+            // 작성자 또는 메시지가 비어있다면 중단
+            if (!author || !message) return;
+
+            // 현재 날짜 생성
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
+
+            // 새로운 메모 객체 생성
+            const newNote = {
+                id: Date.now(),
+                author: author,
+                message: message,
+                color: color,
+                rotation: Math.random() * 10 - 5, // -5도에서 5도 사이의 랜덤 기울기
+                date: dateStr
+            };
+
+            // 기존 목록 앞에 새 메모를 추가 후 저장
+            const notes = getNotes();
+            notes.unshift(newNote);
+            saveNotes(notes);
+
+            // 메시지 입력창만 비우고 작성자 이름은 유지하여 연속 작성 편리성 제공
+            document.getElementById('messageInput').value = '';
+            
+            // 전시 보드 재렌더링
+            renderBoard();
+
+            // 새로 추가된 메모가 가장 위에 보이도록 전시 공간 스크롤 상단 이동
+            const boardContainer = document.getElementById('boardContainer');
+            boardContainer.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // 페이지가 완전히 로드된 후 롤링페이퍼 보드 초기 렌더링 실행
+        window.onload = function() {
+            renderBoard();
+        };
+    </script>
+</body>
+</html>
